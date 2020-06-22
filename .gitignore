@@ -1,0 +1,5 @@
+*.pyc
+*.ses
+tstrepo.txt
+.vscode/settings.json
+*.json
