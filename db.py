@@ -8,8 +8,10 @@ class ConfUtil(object):
         MainSeparator = "PacketRouter Statistics:"
         MainDelimiter = ":"
         OptSeparator = "====="
+        TimeSeparator = "CAT_PDFE_STATISTICS"
         UiMode = False
         ShortExport = False
+        TimeSort = True
         def __init__(self, entry_name, field_name, fields , plugin, mandatory):
             self.group_name = entry_name
             self.field_name = field_name
@@ -61,6 +63,12 @@ class ConfUtil(object):
                     continue
                 elif record == "opt-separator":
                     ConfUtil.ORMMixer.OptSeparator = ConfUtil.db['opt-separator']
+                    continue
+                elif record == "time-sort":
+                    ConfUtil.ORMMixer.TimeSort = ConfUtil.db['time-sort']
+                    continue
+                elif record == "time-delimiter":
+                    ConfUtil.ORMMixer.TimeSeparator = ConfUtil.db['time-delimiter']
                     continue
                 elif record == "short-export":
                     ConfUtil.ORMMixer.ShortExport = ConfUtil.db['short-export']

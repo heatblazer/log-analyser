@@ -1,7 +1,7 @@
 Statistics analyzer tool
 ========================
 
-Tool for parsing SAU logs from their specific format, and display thier statistics in `matplot` graph. 
+Tool for parsing logs from their specific format, and display thier statistics in `matplot` graph. 
 
 
 How to build or contribute to project:
@@ -28,19 +28,23 @@ DSL from `json` file
 	"main-delimiter" : ":",
 	"short-export" : false, 	
 	"ui-mode" : false, 
-	"path" : "C:\\Users\\izapryanov.VERINT\\Desktop\\Samba\\Moov\\215.1.17.31",
+	"path" : "C:\\SomerRootFolder",
 		"group1": {			
-			"name" : "Camera360Elements Statistics:",
-			"fields" : ["API.Products.CertifiedElements.Closed"] 
+			"name" : "Some Statistics:",
+			"fields" : ["Some filter"] 
 		},
 		"group2" : {
 			"mandatory" : false,
 			"name" : "Provisioning statistics:",
-			"fields" : ["Number of Recording Flows", "Number of Targets"]
+			"fields" : ["Number of Something", "Number of Targets"]
 		},
 		"group3" : {
-			"name" : "DailyhuntElements Statistics:",
-			"fields" : ["API.Products.CertifiedElements.Closed", "API.Sockets.InByte", "API.TappingFlow.Opened"]
+			"name" : "Power Statistics:",
+			"fields" : ["powerful fileds"]
+		},
+		group-n : {
+			"name" : "blabla",
+			"fields" : ["list of blablas"]
 		}
 }
 ```
@@ -50,13 +54,12 @@ DSL from `json` file
 - `main-delimiter` : `char` or `string` if not set `:` will be used to split desired lines.
 - `ui-mode` - `true` or `false` enable \ disable plotter or CSV exporter. 
 - `short-export` - `true` or `false` it will export a minimal report for only one entry per `PacketRouter Statistics:` frame
-- `path` - folder to SAU logs (up to 18)
+- `path` - folder  logs (up to 18)
 - `group` - parser to be generated dynamically. 
-- `name` - Group of statistics to be matched in SAU (like `Packet router statistics`)
+- `name` - Group of statistics to be matched 
 - `fields` - sub fields from specific group to match (ex. `NUmber of valid packets...`)
 - `mandatory` - `true` or `false` it will mark a specific group items to be mandatory or not [TODO]
-`TimeParser.py` - used to parse time of SAU and sort log by time, since file is cyclic and older entries might appear earlier in the log file.
-
+[TODO]: add more info 
 
 Limitations:
 ============

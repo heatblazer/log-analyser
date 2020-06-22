@@ -57,7 +57,7 @@ class GridDataHolder:
             optparsers = []
             for orm in ConfUtil.Orms:
                 gp = GenericParser(elem, orm)
-                if TimeFraction.valid(tfract):
+                if TimeFraction.valid(tfract) and ConfUtil.ORMMixer.TimeSort is True:
                     gp.set_time(tfract)
                 if gp.valid():
                     optparsers.append(gp)
@@ -65,7 +65,7 @@ class GridDataHolder:
                     print ("Parser {} missmatch for file {}".format(str(gp), filename))
                 #removed log for dirty data
 
-            if TimeFraction.valid(tfract):
+            if TimeFraction.valid(tfract) and ConfUtil.ORMMixer.TimeSort is True:
                 datNode = GridDataHolder.DataNode(tfract, optparsers)
                 self.data_nodes.append(datNode)
 

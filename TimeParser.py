@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from db import ConfUtil
 
 tdata = ["21/03/20 14:35:23.454 () CAT_PDFE_STATISTICS Informational StatisticsCollector.cpp 36"]
 
@@ -90,7 +91,7 @@ class TimeFraction:
         self.spl = None
         if data is not None:
             for d in data:
-                if "CAT_PDFE_STATISTICS" in d:
+                if ConfUtil.ORMMixer.TimeSeparator in d:
                     self.spl = d.split(" ")
                     if len(self.spl) > 1:
                         self.day = TimeFraction.Day(self.spl[0])
