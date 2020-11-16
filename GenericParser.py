@@ -6,8 +6,6 @@ class GenericParser:
     @staticmethod
     def extract_digit(data):
         #also clamps floats...
-        if ConfUtil.ORMMixer.DigitResolve is True:
-            return data
         dgt = []
         for d in data:
             if d == '\t' or d == '\n' or d == '\r' or d == ' ':
@@ -46,7 +44,7 @@ class GenericParser:
                 if j+1 >= len(data):
                     break            
 
-                if data[j+1].find(ConfUtil.ORMMixer.OptSeparator) is not -1: #!strstr(...)
+                if data[j+1].find(ConfUtil.ORMMixer.OptSeparator) != -1: #!strstr(...)
                     break
 
                 spl = data[j].split(ConfUtil.ORMMixer.MainDelimiter)                
@@ -81,11 +79,14 @@ class GenericParser:
                 self.data = data
                 self.group = group
                 self.time = time
+                self.expected = name
 
         tmpnodes = []
-        for m in self.matched:
-            #print("[{}]: {},{}".format(self.group, m,self.matched[m]))
-            tmpnodes.append(tmpnode(self.group, self.time, m, self.matched[m]))
+        for m in self.matchers:
+            if m in self.matched:
+                tmpnodes.append(tmpnode(self.group, self.time, m, self.matched[m]))
+            else:
+                tmpnodes.append(tmpnode(self.group, self.time, m, ["N/A"]))                
         return tmpnodes
 
     def __str__(self):

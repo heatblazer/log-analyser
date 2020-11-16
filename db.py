@@ -5,26 +5,28 @@ class ConfUtil(object):
     Fname = str()
     Orms = []
     class ORMMixer:
-        DigitResolve = True
         MainSeparator = "PacketRouter Statistics:"
         MainDelimiter = ":"
         OptSeparator = "====="
-        TimeSeparator = "CAT_PDFE_STATISTICS"
         UiMode = False
         ShortExport = False
-        TimeSort = True
-        def __init__(self, entry_name, field_name, fields , plugin, mandatory):
+        SauLogFileTrunk = None
+        SauLogDelimiter = " "
+        TimeSeparator = " "
+        def __init__(self, entry_name, field_name, fields , plugin, mandatory, dexpr):
             self.group_name = entry_name
             self.field_name = field_name
             self.fields = fields
             self.plugin = plugin
             self.mandatory = mandatory
+            self.dyn_expr = dexpr
         
         def group(self):
             return ConfUtil.db[self.group_name]
 
         def mode(self):
             return self.plugin
+        
 
         def __str__(self):
             return "[group:{}]:[field:{}]:[fields:{}]:[plugin:{}]:[mandatory:{}]".format(self.group_name, self.field_name, self.fields, self.plugin, self.mandatory)     
@@ -51,16 +53,20 @@ class ConfUtil(object):
     def dumpall():
         if ConfUtil.db is not None:
             for record in ConfUtil.db:
+                dynexpr = None
                 if record == "path":
-                    continue
-                elif record == "digit-resolve":
-                    ConfUtil.ORMMixer.DigitResolve = ConfUtil.db['digit-resolve']
                     continue
                 elif record == "main-separator":
                     ConfUtil.ORMMixer.MainSeparator = ConfUtil.db['main-separator']
                     continue
+                elif record == "sau-log-delimiter":
+                    ConfUtil.ORMMixer.SauLogDelimiter = ConfUtil.db['sau-log-delimiter']
+                    continue
                 elif record == "main-delimiter":
                     ConfUtil.ORMMixer.MainDelimiter = ConfUtil.db['main-delimiter']
+                    continue
+                elif record == "time-separator":
+                    ConfUtil.ORMMixer.TimeSeparator = ConfUtil.db['time-separator']
                     continue
                 elif record == "ui-mode":
                     ConfUtil.ORMMixer.UiMode = ConfUtil.db['ui-mode']
@@ -68,15 +74,16 @@ class ConfUtil(object):
                 elif record == "opt-separator":
                     ConfUtil.ORMMixer.OptSeparator = ConfUtil.db['opt-separator']
                     continue
-                elif record == "time-sort":
-                    ConfUtil.ORMMixer.TimeSort = ConfUtil.db['time-sort']
-                    continue
-                elif record == "time-delimiter":
-                    ConfUtil.ORMMixer.TimeSeparator = ConfUtil.db['time-delimiter']
-                    continue
                 elif record == "short-export":
                     ConfUtil.ORMMixer.ShortExport = ConfUtil.db['short-export']
                     continue
+                elif record == "sau-log-file":
+                    ConfUtil.ORMMixer.SauLogFileTrunk = ConfUtil.db['sau-log-file']
+                    continue
+                elif record == "dynamic-expression":
+                    dynexpr = ConfUtil.db['dynamic-expression']
+                    
+
                 d = ConfUtil.db[record]
                 plg = False
                 mandatory = False
@@ -84,8 +91,16 @@ class ConfUtil(object):
                     plg = d['plugin']
                 elif 'mandatory' in d:
                     mandatory = d['mandatory']
+                if 'name' not in d:
+                    pname = "None"
+                else:
+                    pname = d['name']
+                if 'fields' not in d:
+                    flds = []
+                else:
+                    flds = d['fields']
 
-                ConfUtil.Orms.append(ConfUtil.ORMMixer(record, d["name"], d["fields"], plg, mandatory))
+                ConfUtil.Orms.append(ConfUtil.ORMMixer(record, pname, flds, plg, mandatory, dynexpr))
 
 
     @staticmethod
@@ -110,5 +125,7 @@ if __name__ == "__main__":
 
     for kv in ConfUtil.Orms:
         print("MODE: ", kv.mode())
-        print(str(kv))
+        print(kv.field_name)
+        print(kv.dyn_expr)
+
     pass

@@ -1,8 +1,17 @@
 from datetime import datetime
-
 from db import ConfUtil
+from DynamicExpression import DynamicEx
 
-tdata = ["21/03/20 14:35:23.454 () CAT_PDFE_STATISTICS Informational StatisticsCollector.cpp 36"]
+
+tdata = [
+"14/04/20 03:56:00.898 (00) CAT_PDFE_STATISTICS Informational StatisticsCollector.cpp 36",
+"PdfeLoggerSAU131_IM_SN_VoIP12/11/20 11:20:48.096 (00) CAT_PDFE_SDK_INIT Informational SdkStunRTP::EventsHandlerTCP::OnStaticConn 83 [7796711]: New connection for Application VoIP TCP [conn: 10.164.85.30:45376 - 64.233.164.188:5228",
+"PdfeLoggerSAU149_IM_SN_VoIP	SdkStunRTP::EventsHandlerTCP::HandleTlsData	210	12/09/20 19:00:57.208 (00)	CAT_PDFE_SDK_LOGICS	Informational	2504	5320",
+"PdfeLoggerSAU149_IM_SN_VoIP SdkStunRTP::EventsHandlerTCP::HandleTlsData	210		CAT_PDFE_SDK_LOGICS	Informational	250412/09/20 19:19:54.158 (00)	5320",
+"PdfeLoggerSAU149_IM_SN_VoIP	SdkStunRTP::EventsHandlerTCP::HandleTlsData	210	12/09/20 19:19:54.158 (00)	CAT_PDFE_SDK_LOGICS	Informational	2504	5320",
+"PdfeLoggerSAU149_IM_SN_VoIP	12/09/20 19:19:54.158 (00) SdkStunRTP::EventsHandlerTCP::HandleTlsData	210		CAT_PDFE_SDK_LOGICS	Informational	2504	5320",
+"12/09/20 19:19:54.158 (00) PdfeLoggerSAU149_IM_SN_VoIP	 SdkStunRTP::EventsHandlerTCP::HandleTlsData	210		CAT_PDFE_SDK_LOGICS	Informational	2504	5320"
+]
 
 def unix_time(dt):
     epoch = datetime.utcfromtimestamp(0)
@@ -35,6 +44,13 @@ class TimeFraction:
     def valid(tf):
         return tf.utc > 0
 
+
+#    dynamic_arr = [DynamicEx.Digit(), DynamicEx.Digit(), DynamicEx.Separator(), 
+#                DynamicEx.Digit(), DynamicEx.Digit(), DynamicEx.Separator(), 
+#                DynamicEx.Digit(), DynamicEx.Digit(), DynamicEx.Separator(), 
+#                DynamicEx.Digit(), DynamicEx.Digit(), DynamicEx.Separator(':'), 
+#                DynamicEx.Digit(), DynamicEx.Digit(), DynamicEx.Separator(':'), 
+#                DynamicEx.Digit(), DynamicEx.Digit(), DynamicEx.Separator()]
 
     class Day:
 
@@ -83,22 +99,29 @@ class TimeFraction:
         def __str__(self):
             return self.original
 
+    TimeOffset = -1
+
+    dynamic_expr = None
 
     def __init__(self, data=None):
+        if TimeFraction.dynamic_expr is None:
+            TimeFraction.dynamic_expr = DynamicEx()
+        ############################################################
         self.day = None
         self.hour = None
         self.utc = -1
         self.spl = None
-        if data is not None:
-            for d in data:
-                if ConfUtil.ORMMixer.TimeSeparator in d:
-                    self.spl = d.split(" ")
-                    if len(self.spl) > 1:
-                        self.day = TimeFraction.Day(self.spl[0])
-                        self.hour = TimeFraction.Hour(self.spl[1])
-                        if self.day is not None and self.hour is not None:
-                            a = datetime.strptime(str(self), "%Y-%m-%dT%H:%M:%S.%fZ")
-                            self.utc = int(unix_time_millis(a))
+        self.ok = True
+        for d in data:
+            timestr = TimeFraction.dynamic_expr.match(d)
+            if timestr is not None:
+                s = timestr.split(" ")#self.spl[c].split(" ")
+                self.day = TimeFraction.Day(s[0])
+                self.hour = TimeFraction.Hour(s[1])
+                if self.day is not None and self.hour is not None:
+                    a = datetime.strptime(str(self), "%Y-%m-%dT%H:%M:%SZ")
+                    self.utc = int(unix_time_millis(a))
+                break      
 
 
     def __eq__(self, other):
@@ -116,16 +139,18 @@ class TimeFraction:
 #unit test
 if __name__ == "__main__":
 
+    ConfUtil.load("db_ver1.json")
+    ConfUtil.dumpall()
+
+
+
     tf1 = TimeFraction(tdata)
     tf2 = TimeFraction(tdata)
     
-    TimeFraction.valid(tf1)
-    TimeFraction.valid(tf2)
+    if TimeFraction.valid(tf1) and TimeFraction.valid(tf2):
 
-    if tf1 == tf2:
-        print("Same")
-    else:
-        print("Not same")
-
-
+        if tf1 == tf2:
+            print("Same")
+        else:
+            print("Not same")
 

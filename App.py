@@ -32,7 +32,7 @@ class Application:
     def Run(self, uimode=True):
         """app runner"""
         import Utils 
-
+        
         self.log_folder = ConfUtil.path()
         self.files = Utils.Utils.get_filesr(ConfUtil.path()) #array of files 
         os.chdir(self.log_folder)

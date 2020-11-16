@@ -1,0 +1,23 @@
+{ 
+  "main-separator" : "PacketRouter Statistics:",
+  "main-delimiter" : ":",
+  "path" : "/home/ilian/Desktop/verint/Data/MailsLogShort",
+  "ui-mode" : true, 
+  "sau-log-delimiter" : " ",
+  "dynamic-expression" : ["int", "int", "del/", 
+                          "int", "int", "del/", 
+                          "int", "int", "del ", 
+                          "int", "int", "del:", 
+                          "int", "int", "del:", 
+                          "int", "int"],
+                          
+  "time-separator" : "CAT_PDFE_",
+    "B": {
+    "name" : "Process Memory Statistics:",
+    "fields" : ["Physical Memory Working Set Size", "Virtual Memory Private Usage Size","Virtual Memory Page Fault Count"]
+    },
+    "A" : {
+      "name" : "SMTP Statistics:",
+      "fields" : ["Received Bytes", "Bytes Rate", "Number of discarded Mails because of TCP loss"]
+    }
+}

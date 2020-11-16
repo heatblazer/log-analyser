@@ -1,9 +1,20 @@
 from TimeParser import TimeFraction
 from GenericParser import GenericParser
 from db import ConfUtil
+from threading import Thread
 
 class GridDataHolder:
     """data aggregator for the log file, separates data from render context"""
+
+    class AddIf:
+
+        def __init__(self):
+            pass
+
+        def __call__(self):
+            pass
+
+
 
     class DataNode:
         """data node to put desired data for parsing.
@@ -22,11 +33,58 @@ class GridDataHolder:
             return self.time < rhs.time
 
 
-    def __init__(self, filename=None):
-        """init parsers here"""            
+    def __init__(self, filename=None, sau_stat=True):
+        """init parsers here"""     
+        self.filename = filename       
         self.data_nodes =[]
-        main_separator = ConfUtil.ORMMixer.MainSeparator
-        with open(filename, "r") as fp:
+        self.main_separator = ConfUtil.ORMMixer.MainSeparator
+    
+
+    def data(self):
+        return self.data_nodes
+
+
+    def parse_saulog(self, add_if=None):
+        with open(self.filename, "r") as fp:
+            lines = 0
+            grid = []
+            #don't do recursion! on huge file python interpreter max depth exceeds 3000 calls on stack!
+            while True:
+                line = fp.readline()                
+                if not line:
+                    break
+                if line == "\n" or line == "\r":
+                    continue
+                lines += 1
+                if self.main_separator in line:
+                    bStop = False
+                    while bStop is False:
+                        next = fp.readline()                        
+                        if next == "\n" or next == "\r" or next == "\r\n":
+                            continue
+                        if not next or self.main_separator in next: 
+                            break
+                        for kv in ConfUtil.Orms:
+                            if kv.field_name in next:
+                                grid.append([])
+                                grid[len(grid)-1].append(line)
+                                grid[len(grid)-1].append(next)
+                                bStop = True
+                                break
+            
+            for d in grid:
+                tf = TimeFraction(d)
+                if TimeFraction.valid(tf):
+                    self.data_nodes.append(GridDataHolder.DataNode(tf, d))
+                else:
+                    print("Invalid!!!")
+                    break
+            #self.data_nodes.sort()
+            
+
+
+    def parse_statistics(self):
+        with open(self.filename, "r") as fp:
             lines = 0
             datagrid = []
             last = False
@@ -38,38 +96,35 @@ class GridDataHolder:
                 if line == "\n" or line == "\r":
                     continue
                 lines += 1
-                if main_separator in line or last is True:
+                if self.main_separator in line or last is True:
                     datagrid.append([])
-                    datagrid[len(datagrid)-1].append(main_separator)
+                    #datagrid[len(datagrid)-1].append(main_separator)
                     while True:
                         next = fp.readline()
                         if next == "\n" or next == "\r" or next == "\r\n":
                             continue
-                        if main_separator in next:
+                        if self.main_separator in next:
                             last = True    
                             break
                         if not next: 
                             break
                         datagrid[len(datagrid)-1].append(next)
-
         for elem in datagrid:
             tfract = TimeFraction(elem)
             optparsers = []
             for orm in ConfUtil.Orms:
                 gp = GenericParser(elem, orm)
-                if TimeFraction.valid(tfract) and ConfUtil.ORMMixer.TimeSort is True:
+                if TimeFraction.valid(tfract):
                     gp.set_time(tfract)
                 if gp.valid():
                     optparsers.append(gp)
                 else:
-                    print ("Parser {} missmatch for file {}".format(str(gp), filename))
+                    continue
                 #removed log for dirty data
 
-            if TimeFraction.valid(tfract) and ConfUtil.ORMMixer.TimeSort is True:
+            if TimeFraction.valid(tfract):
                 datNode = GridDataHolder.DataNode(tfract, optparsers)
                 self.data_nodes.append(datNode)
 
-        #sort by time :)
-        if ConfUtil.ORMMixer.TimeSort is True:
-            self.data_nodes.sort()
-        pass
+        #sort by time :)         
+        self.data_nodes.sort()

@@ -1,8 +1,9 @@
 import csv 
 
 from GridDataHolder import GridDataHolder
-
 from Utils import Utils
+from db import ConfUtil
+
 
 class CsvContext:
 
@@ -17,6 +18,7 @@ class CsvContext:
 
     def __init__(self, filename):
         self.graph_data_holder = GridDataHolder(filename)
+        self.graph_data_holder.parse_statistics()
         self._name = None 
         if Utils.unix() == False:
             tmp = filename.split("\\")
@@ -47,12 +49,21 @@ class CsvContext:
                 matched = o.matched_data()
                 for item in matched:
                     for j in range(0, len(item.data)):
-                        self.csv_writer.writerow({CsvContext.ConstFields.FrameNumber:i, \
-                        CsvContext.ConstFields.Time : str(item.time), \
-                        CsvContext.ConstFields.SauInstance : self._name, \
-                        CsvContext.ConstFields.GroupName : item.group, \
-                        CsvContext.ConstFields.Field : item.name,  \
-                        CsvContext.ConstFields.Value : item.data[j]})
+                        if ConfUtil.ORMMixer.ShortExport is True:
+                            self.csv_writer.writerow({CsvContext.ConstFields.FrameNumber:i, \
+                            CsvContext.ConstFields.Time : str(item.time), \
+                            CsvContext.ConstFields.SauInstance : self._name, \
+                            CsvContext.ConstFields.GroupName : item.group, \
+                            CsvContext.ConstFields.Field : item.name,  \
+                            CsvContext.ConstFields.Value : item.data[len(item.data)-1]})
+                            break
+                        else:        
+                            self.csv_writer.writerow({CsvContext.ConstFields.FrameNumber:i, \
+                            CsvContext.ConstFields.Time : str(item.time), \
+                            CsvContext.ConstFields.SauInstance : self._name, \
+                            CsvContext.ConstFields.GroupName : item.group, \
+                            CsvContext.ConstFields.Field : item.name,  \
+                            CsvContext.ConstFields.Value : item.data[j]})
         self.csv_file.close()
 
 

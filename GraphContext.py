@@ -73,7 +73,7 @@ class GraphCtx:
     def __init__(self, filename=None):
         #now separates data from rendering context, so data not dependant on matpltlib, pandas, etc...
         self.graph_data_holder = GridDataHolder(filename)
-
+        self.graph_data_holder.parse_statistics()
         self._name = None #filename.split(".")[0]
         tmp = filename.split("\\")
         if (len(tmp) > 0):
