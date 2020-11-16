@@ -69,6 +69,7 @@ class GridDataHolder:
                 datNode = GridDataHolder.DataNode(tfract, optparsers)
                 self.data_nodes.append(datNode)
 
-        #sort by time :)         
-        self.data_nodes.sort()
+        #sort by time :)
+        if ConfUtil.ORMMixer.TimeSort is True:
+            self.data_nodes.sort()
         pass

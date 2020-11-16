@@ -5,6 +5,7 @@ class ConfUtil(object):
     Fname = str()
     Orms = []
     class ORMMixer:
+        DigitResolve = True
         MainSeparator = "PacketRouter Statistics:"
         MainDelimiter = ":"
         OptSeparator = "====="
@@ -51,6 +52,9 @@ class ConfUtil(object):
         if ConfUtil.db is not None:
             for record in ConfUtil.db:
                 if record == "path":
+                    continue
+                elif record == "digit-resolve":
+                    ConfUtil.ORMMixer.DigitResolve = ConfUtil.db['digit-resolve']
                     continue
                 elif record == "main-separator":
                     ConfUtil.ORMMixer.MainSeparator = ConfUtil.db['main-separator']

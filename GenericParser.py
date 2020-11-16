@@ -6,6 +6,8 @@ class GenericParser:
     @staticmethod
     def extract_digit(data):
         #also clamps floats...
+        if ConfUtil.ORMMixer.DigitResolve is True:
+            return data
         dgt = []
         for d in data:
             if d == '\t' or d == '\n' or d == '\r' or d == ' ':
